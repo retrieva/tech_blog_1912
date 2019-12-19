@@ -72,12 +72,12 @@ class BilstmCRF(tf.keras.Model):
         self.crf_layer = CRF(num_tags, name='crf_layer')
 
     @tf.function(autograph=True) # autograph=Falseでグラフモードへの変換を停止
-    def call(self, inputs):
+    def call(self, inputs, training):
         x = self.embedding_layer(inputs)
         mask = x._keras_mask
-        x = self.bilstm_layer(x, mask=mask)
-        x = self.dense_layer(x)
-        x = self.crf_layer(x, mask=tf.cast(mask, tf.int32)) 
+        x = self.bilstm_layer(x, mask=mask, training=training)
+        x = self.dense_layer(x, training=training)
+        x = self.crf_layer(x, mask=tf.cast(mask, tf.int32), training=training) 
 
         return x
 
